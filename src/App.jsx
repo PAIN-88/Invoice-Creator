@@ -36,7 +36,7 @@ function PartyForm({ title, p, onChange }) {
 }
 
 export default function App() {
-  const [inv, setInv] = useState(SAMPLE);
+  const [inv, setInv] = useState(EMPTY);
   const set = (k, v) => setInv((s) => ({ ...s, [k]: v }));
   const setParty = (who) => (k, v) => setInv((s) => ({ ...s, [who]: { ...s[who], [k]: v } }));
   const setItem = (i, k, v) => set("items", inv.items.map((it, j) => (j === i ? { ...it, [k]: v } : it)));
