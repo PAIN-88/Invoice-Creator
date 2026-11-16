@@ -32,5 +32,3 @@ th{background:#f0f2ee;font-weight:500}
 .sign{text-align:right}
 @media (max-width:900px){.app{grid-template-columns:1fr}.editor{position:static;max-height:none}.grid2{grid-template-columns:1fr}}
 @media print{.no-print{display:none!important}body{background:#fff}.app{display:block}.preview{padding:0}.sheet{border:1px solid #000;max-width:none}}
-
-.ok{color:#1f6b3f;font-size:.8rem}.bad{color:#b3372c;font-size:.8rem}

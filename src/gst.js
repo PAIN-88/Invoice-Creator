@@ -39,16 +39,3 @@ export const words = (paise) => {
   const r = Math.floor(paise / 100), ps = paise % 100;
   return "INR " + w(r) + (ps ? " and " + w(ps) + " Paise" : "") + " Only";
 };
-
-// GSTIN format + checksum check (works offline; does not prove the business exists)
-const CH = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-export function isValidGstin(g) {
-  g = (g || "").trim().toUpperCase();
-  if (!/^(0[1-9]|[1-2][0-9]|3[0-9])[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/.test(g)) return false;
-  let sum = 0;
-  for (let i = 0; i < 14; i++) {
-    const p = CH.indexOf(g[i]) * (i % 2 === 0 ? 1 : 2);
-    sum += Math.floor(p / 36) + (p % 36);
-  }
-  return CH[(36 - (sum % 36)) % 36] === g[14];
-}
