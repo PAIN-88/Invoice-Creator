@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { calc, inr, words } from "./gst.js";
+import { calc, inr, words, isValidGstin } from "./gst.js";
 
 const party = (name, address, gstin, state, code) => ({ name, address, gstin, state, code });
 const SAMPLE = {
@@ -27,9 +27,22 @@ function PartyForm({ title, p, onChange }) {
             : <input value={p[k]} onChange={(e) => onChange(k, e.target.value)} />}
     </label>
   );
+  const g = p.gstin;
+  const sameCode = (x, y) => x.replace(/^0+/, "") === y.trim().replace(/^0+/, ""); // "9" and "09" are the same
+  let note = null;
+  if (g.length > 0 && g.length < 15) note = <span className="hint">{g.length}/15 characters</span>;
+  else if (g.length === 15) {
+    if (!isValidGstin(g)) note = <span className="bad">Check this GSTIN: the format or check digit is wrong.</span>;
+    else if (!sameCode(g.slice(0, 2), p.code)) note = <span className="bad">GSTIN starts with {g.slice(0, 2)} but the state code is {p.code || "empty"}.</span>;
+    else note = <span className="ok">GSTIN format is valid.</span>;
+  }
   return (
     <fieldset><legend>{title}</legend>
-      {f("name", "Name")}{f("address", "Address", true)}{f("gstin", "GSTIN")}
+      {f("name", "Name")}{f("address", "Address", true)}
+      <label>GSTIN
+        <input maxLength={15} value={p.gstin} onChange={(e) => onChange("gstin", e.target.value.replace(/\s/g, "").toUpperCase())} aria-invalid={note?.props.className === "bad"} />
+        {note}
+      </label>
       <div className="row">{f("state", "State")}{f("code", "State code")}</div>
     </fieldset>
   );
@@ -41,7 +54,8 @@ export default function App() {
   const setParty = (who) => (k, v) => setInv((s) => ({ ...s, [who]: { ...s[who], [k]: v } }));
   const setItem = (i, k, v) => set("items", inv.items.map((it, j) => (j === i ? { ...it, [k]: v } : it)));
 
-  const inter = inv.seller.code.trim() !== inv.buyer.code.trim();
+  const norm = (c) => c.trim().replace(/^0+/, "");
+  const inter = norm(inv.seller.code) !== norm(inv.buyer.code);
   const t = calc(inv.items, inter);
   const qty = inv.items.reduce((s, i) => s + (+i.qty || 0), 0);
 
