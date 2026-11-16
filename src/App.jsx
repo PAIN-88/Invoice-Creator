@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { calc, inr, words } from "./gst.js";
+import { calc, inr, words, isValidGstin } from "./gst.js";
 
 const party = (name, address, gstin, state, code) => ({ name, address, gstin, state, code });
 const SAMPLE = {
@@ -27,9 +27,20 @@ function PartyForm({ title, p, onChange }) {
             : <input value={p[k]} onChange={(e) => onChange(k, e.target.value)} />}
     </label>
   );
+  const g = p.gstin.trim();
+  let note = null;
+  if (g) {
+    if (!isValidGstin(g)) note = <span className="bad">Check this GSTIN: the format or check digit is wrong.</span>;
+    else if (g.slice(0, 2) !== p.code.trim()) note = <span className="bad">GSTIN starts with {g.slice(0, 2)} but the state code is {p.code || "empty"}.</span>;
+    else note = <span className="ok">GSTIN format is valid.</span>;
+  }
   return (
     <fieldset><legend>{title}</legend>
-      {f("name", "Name")}{f("address", "Address", true)}{f("gstin", "GSTIN")}
+      {f("name", "Name")}{f("address", "Address", true)}
+      <label>GSTIN
+        <input maxLength={15} value={p.gstin} onChange={(e) => onChange("gstin", e.target.value.toUpperCase())} aria-invalid={note?.props.className === "bad"} />
+        {note}
+      </label>
       <div className="row">{f("state", "State")}{f("code", "State code")}</div>
     </fieldset>
   );
